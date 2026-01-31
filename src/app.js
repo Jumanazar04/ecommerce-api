@@ -28,6 +28,8 @@ app.get("/docs.json", (req, res) => res.json(swaggerSpec));
 
 app.use(notFound);
 app.use(errorHandler);
+app.use(require("./middleware/error.middleware"));
+
 
 
 

@@ -8,7 +8,7 @@ const createSchema = z.object({
   price: z.number().int().nonnegative(),
   stock: z.number().int().nonnegative().optional(),
   categoryId: z.string().optional(),
-
+  imageUrl: z.string().url().optional().nullable(),
 });
 
 const updateSchema = createSchema.partial();
@@ -24,7 +24,7 @@ exports.createProduct = async (req, res, next) => {
         price: data.price,
         stock: data.stock ?? 0,
         categoryId: data.categoryId ?? null,
-
+        imageUrl: imageUrl?.trim() || null,
       },
     });
 
@@ -93,14 +93,35 @@ exports.getProduct = async (req, res, next) => {
 exports.updateProduct = async (req, res, next) => {
   try {
     const id = req.params.id;
-    const data = updateSchema.parse(req.body);
 
-    const exists = await prisma.product.findUnique({ where: { id } });
-    if (!exists) return res.status(404).json({ error: "Product not found" });
+    // 1️⃣ Avval product bor-yo‘qligini tekshiramiz
+    const exists = await prisma.product.findUnique({
+      where: { id },
+    });
 
+    if (!exists) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    // 2️⃣ Body ni validate qilamiz
+    const parsedData = updateSchema.parse(req.body);
+
+    const { imageUrl, ...rest } = parsedData;
+
+    // 3️⃣ Update
     const product = await prisma.product.update({
       where: { id },
-      data,
+      data: {
+        ...rest,
+
+        // imageUrl logikasi
+        imageUrl:
+          imageUrl === undefined
+            ? undefined      // kelmagan bo‘lsa → tegmaydi
+            : imageUrl === ""
+            ? null           // bo‘sh string bo‘lsa → o‘chadi
+            : imageUrl.trim(), // normal holat
+      },
     });
 
     res.json({ product });
@@ -109,6 +130,7 @@ exports.updateProduct = async (req, res, next) => {
     next(err);
   }
 };
+
 
 exports.deleteProduct = async (req, res, next) => {
   try {

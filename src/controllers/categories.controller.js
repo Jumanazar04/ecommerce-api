@@ -26,7 +26,7 @@ exports.createCategory = async (req, res, next) => {
     const slug = data.slug ? slugify(data.slug) : slugify(data.name);
 
     const category = await prisma.category.create({
-      data: { name: data.name.trim(), slug },
+      data: { name: data.name.trim(), slug, imageUrl: imageUrl?.trim() || null },
     });
 
     res.status(201).json({ category });
