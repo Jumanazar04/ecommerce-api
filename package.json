@@ -9,7 +9,7 @@
     "start": "node src/server.js",
     "prisma": "prisma",
     "postinstall": "npx prisma generate",
-    "migrate:deploy": "prisma migrate deploy"
+    "migrate:deploy": "npx prisma migrate deploy"
   },
   "keywords": [],
   "author": "",
