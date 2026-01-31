@@ -8,7 +8,8 @@
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
     "prisma": "prisma",
-    "postinstall": "npx prisma generate",
+    "postinstall": "node -e \"const fs=require('fs'); try{fs.chmodSync('node_modules/.bin/prisma',0o755)}catch(e){}\" && npx prisma generate"
+    ,
     "migrate:deploy": "npx prisma migrate deploy"
   },
   "keywords": [],
